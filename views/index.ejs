@@ -12,15 +12,21 @@
   <div class="tab">
     <% if (locals.members) {%>
       <% let familyMembers = JSON.parse(members) %>
-      <% familyMembers.forEach(element => { %>
-        <button  class="member" id = <%= element["id"] %>><%= element["name"] %></button>
-      <% }); %>
+      <form name="members" method ="post" action ="/member" >
+        <% familyMembers.forEach(element => { %>
+          <button type="submit" id=<%= element["id"] %> name="memberId" value = <%= element["id"] %>  style="background-color: <%= element["colour"] %>;">
+            <%= element["name"] %>
+          </button>
+        <% }); %>
+        <button type="submit" name ="memberId" value ="new">+</button>
+      </form>
     <% } %>
-  </div>
+   </div>
+
   
   <!-- Get input -->
-  <form method ="post" action ="/add" >
-    <input type="text" autofocus placeholder="Enter country here"> 
+  <form id="country" method ="post" action ="/add?id=<%= id %>" >
+    <input name="countryInput" type="text" autofocus placeholder="<%= locals.error || 'Enter country here' %> "> 
     <button >Submit</button>
   </form>
 
@@ -389,34 +395,27 @@
     
   <!-- Javascript -->
   <script type="text/javascript" charset="utf-8">
-    let memberId ;
-    <% if (  locals.visitedCountries){  %>
-      const country_codes = "<%= visitedCountries %>".split(",") ;
-      console.log(typeof ("<%= visitedCountries %>"))
-      country_codes.forEach(code => {
-        document.getElementById(code).style.fill = 'teal'
+    deactivateMembers();
+    $("#<%= id %>").addClass("active");
+    const countryCodes = "<%= visitedCountries %>".split(",") ;
+    console.log(countryCodes);
+    console.log(countryCodes[0] != "");
+    if (countryCodes[0] != "" ){ // As the empty strings prop value is undefined
+      countryCodes.forEach(code => {
+        console.log(`code : ${code}`);
+        document.getElementById(code).style.fill = '<%= colour %>';
       });
-      <% }; %>
+    };
 
 
-    // Function to select the page according to the user
-    //---------------------------------------------------
-    $(".member").on("click",function(event){
+    // Function to activate the current member tab
+    //---------------------------------------------
+    function deactivateMembers(){
       member = $(".member");
       for (i = 0; i < member.length; i++) {
         member[i].className = member[i].className.replace(" active", ""); // diasble all members
-      }
-      console.log($(".member")[0]);
-      event.currentTarget.className += " active"; // make only the current member active
-      const memberId = this.id;
-      console.log(`memberId : ${memberId}`);
-      $.post("/",{memberId : memberId}); 
-    });
-
-    // Function to select visited countries
-    //--------------------------------------
-    
-
+      };
+    };
 
   </script>
 </body>
